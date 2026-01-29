@@ -38,7 +38,7 @@ function getSeverityClass(label) {
 
 function renderProbRows(container, classes, scores, limit = 2) {
   container.innerHTML = "";
-  const items = classes.map((c, i) => ({c, score: scores[i] || 0}));
+  const items = classes.map((c, i) => ({ c, score: scores[i] || 0 }));
   items.sort((a, b) => b.score - a.score);
   const topItems = items.slice(0, limit);
 
@@ -56,7 +56,7 @@ function renderProbRows(container, classes, scores, limit = 2) {
       </div>
     `;
     container.appendChild(div);
-    
+
     // Animate bar
     setTimeout(() => {
       const bar = div.querySelector('.prob-bar');
@@ -76,7 +76,7 @@ function toggleBusy(isBusy) {
 }
 
 function addToHistory(drug1, drug2, interaction, severity) {
-  history.unshift({drug1, drug2, interaction, severity, time: nowStr()});
+  history.unshift({ drug1, drug2, interaction, severity, time: nowStr() });
   if (history.length > 10) history.pop();
   renderHistory();
 }
@@ -87,7 +87,7 @@ function renderHistory() {
     historyList.innerHTML = '';
     return;
   }
-  
+
   emptyHistory.classList.add('hidden');
   historyList.innerHTML = history.map((h, i) => `
     <div class="history-card bg-white rounded-xl p-4 border border-gray-200 hover:border-purple-300" 
@@ -106,11 +106,11 @@ function renderHistory() {
   `).join('');
 }
 
-window.loadFromHistory = function(index) {
+window.loadFromHistory = function (index) {
   const h = history[index];
   drug1El.value = h.drug1;
   drug2El.value = h.drug2;
-  window.scrollTo({top: 0, behavior: 'smooth'});
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
 form.addEventListener('submit', async (ev) => {
@@ -130,8 +130,8 @@ form.addEventListener('submit', async (ev) => {
   try {
     const res = await fetch(backend, {
       method: "POST",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({drug1: d1, drug2: d2})
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ drug1: d1, drug2: d2 })
     });
 
     const data = await res.json();
@@ -154,7 +154,7 @@ form.addEventListener('submit', async (ev) => {
     renderProbRows(severityClasses, data.severity.classes, data.severity.scores, 2);
 
     resultCard.classList.remove("hidden");
-    
+
     addToHistory(d1, d2, data.interaction.label, data.severity.label);
 
   } catch (e) {
@@ -175,13 +175,13 @@ document.getElementById('downloadHistory').addEventListener('click', () => {
     alert('No history to download!');
     return;
   }
-  
+
   let csv = 'Drug 1,Drug 2,Interaction,Severity,Time\n';
   history.forEach(h => {
     csv += `"${h.drug1}","${h.drug2}","${h.interaction}","${h.severity}","${h.time}"\n`;
   });
-  
-  const blob = new Blob([csv], {type: 'text/csv'});
+
+  const blob = new Blob([csv], { type: 'text/csv' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
@@ -190,6 +190,4 @@ document.getElementById('downloadHistory').addEventListener('click', () => {
   URL.revokeObjectURL(url);
 });
 
-drug1El.value = "Bivalirudin";
-drug2El.value = "Apixaban";
 renderHistory();
